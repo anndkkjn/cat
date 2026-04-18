@@ -1,90 +1,122 @@
 ```mermaid
 graph TD
-    A[Client] -->|HTTPS| S[Ticket System]
-    B[Operator] -->|HTTPS| S
-    C[Admin] -->|HTTPS| S
-    S -->|SMTP| D[Email Service]
-    S -->|HTTP API| E[SMS Gateway]
-    S -->|LDAP| F[External Auth]
-```
+    A[User] -->|Клиент создаёт заявку| S[Ticket System]
+    B[User] -->|Оператор назначает| S
+    C[User] -->|Админ управляет| S
+    S -->|SMTP уведомления| D[Email]
+    S -->|SMS уведомления| E[SMS]
+    S -->|LDAP проверка| F[Auth]
+text
 
-```mermaid
+Но это **некрасиво и неудобно**.
+
+---
+
+## Решение 2. Экспорт в PNG с русским текстом (РЕКОМЕНДУЮ)
+
+Это **единственный надёжный способ** получить русский текст в диаграммах на GitHub.
+
+### Инструкция (по шагам):
+
+**Шаг 1.** Откройте [Mermaid Live Editor](https://mermaid.live/)
+
+**Шаг 2.** Скопируйте этот код в левую панель:
 graph TD
-    A[Client] --> W[Web App]
-    A --> M[Mobile App]
-    B[Operator] --> W
-    C[Admin] --> W
-    W -->|REST API| API[Backend API]
-    M -->|REST API| API
-    API -->|JDBC| DB[(PostgreSQL)]
-    API -->|Redis| R[(Redis)]
-    API -->|Queue| WK[Worker]
-    WK -->|SMTP| E[Email Service]
-    WK -->|HTTP| S[SMS Gateway]
-```
+A[Клиент] -->|HTTPS| S[Система обработки заявок]
+B[Оператор] -->|HTTPS| S
+C[Администратор] -->|HTTPS| S
+S -->|SMTP| D[Email сервис]
+S -->|HTTP API| E[SMS шлюз]
+S -->|LDAP| F[Внешняя аутентификация]
 
-```mermaid
+text
+
+**Шаг 3.** Нажмите **Export as PNG** → сохраните как `diagram1.png`
+
+**Шаг 4.** Повторите для остальных диаграмм (коды ниже)
+
+---
+
+## Коды для остальных диаграмм (с русским текстом)
+
+### Диаграмма 2 (Контейнеры)
 graph TD
-    subgraph Backend_API
-        A[Auth Component]
-        B[User Management]
-        C[Ticket Management]
-        D[Category Management]
-        E[Notification Dispatcher]
-        F[Reporting Component]
-    end
-    A -->|check| DB[(PostgreSQL)]
-    A -->|proxy| EA[External Auth]
-    B -->|CRUD| DB
-    C -->|save| DB
-    C -->|validate| D
-    C -->|event| E
-    D -->|cache| R[(Redis)]
-    E -->|task| WK[Worker]
-    F -->|read| DB
-```
+A[Клиент] --> W[Веб приложение]
+A --> M[Мобильное приложение]
+B[Оператор] --> W
+C[Администратор] --> W
+W -->|REST API| API[Backend API]
+M -->|REST API| API
+API -->|JDBC| DB[(PostgreSQL)]
+API -->|Redis| R[(Redis)]
+API -->|Queue| WK[Worker]
+WK -->|SMTP| E[Email сервис]
+WK -->|HTTP| S[SMS шлюз]
 
-```mermaid
+text
+
+### Диаграмма 3 (Компоненты)
+graph TD
+subgraph Backend_API
+A[Компонент аутентификации]
+B[Управление пользователями]
+C[Управление заявками]
+D[Управление категориями]
+E[Диспетчер уведомлений]
+F[Компонент отчетов]
+end
+A -->|проверка| DB[(PostgreSQL)]
+A -->|прокси| EA[Внешняя аутентификация]
+B -->|CRUD| DB
+C -->|сохранение| DB
+C -->|проверка| D
+C -->|событие| E
+D -->|кеш| R[(Redis)]
+E -->|задача| WK[Worker]
+F -->|чтение| DB
+
+text
+
+### Диаграмма 4 (Код)
 classDiagram
-    class Ticket {
-        -Long id
-        -Long userId
-        -String title
-        -String description
-        -Long categoryId
-        -TicketStatus status
-        +getters()
-        +setters()
-    }
-    class TicketStatus {
-        <<enum>>
-        NEW
-        IN_PROGRESS
-        RESOLVED
-        CLOSED
-    }
-    class TicketService {
-        <<interface>>
-        +createTicket(request)
-        +assignTicket(id, assigneeId)
-        +changeStatus(id, status)
-    }
-    class TicketServiceImpl {
-        -TicketRepository repo
-        -NotificationDispatcher nd
-        -CategoryService cs
-        +createTicket(request)
-        +assignTicket(id, assigneeId)
-    }
-    class TicketRepository {
-        <<interface>>
-        +save(ticket)
-        +findById(id)
-        +findByUser(userId)
-    }
-    TicketServiceImpl ..|> TicketService
-    TicketServiceImpl --> TicketRepository
-    TicketServiceImpl --> NotificationDispatcher
-    TicketServiceImpl --> CategoryService
-    TicketRepository ..> Ticket
-```
+class Заявка {
+-Long id
+-Long userId
+-String заголовок
+-String описание
+-Long categoryId
+-Статус статус
++геттеры()
++сеттеры()
+}
+class Статус {
+<<enum>>
+НОВАЯ
+В РАБОТЕ
+РЕШЕНА
+ЗАКРЫТА
+}
+class СервисЗаявок {
+<<interface>>
++создатьЗаявку(запрос)
++назначитьЗаявку(id, исполнитель)
++изменитьСтатус(id, статус)
+}
+class РеализацияСервисаЗаявок {
+-РепозиторийЗаявок repo
+-ДиспетчерУведомлений nd
+-СервисКатегорий cs
++создатьЗаявку(запрос)
++назначитьЗаявку(id, исполнитель)
+}
+class РепозиторийЗаявок {
+<<interface>>
++сохранить(заявка)
++найтиПоИд(id)
++найтиПоПользователю(userId)
+}
+РеализацияСервисаЗаявок ..|> СервисЗаявок
+РеализацияСервисаЗаявок --> РепозиторийЗаявок
+РеализацияСервисаЗаявок --> ДиспетчерУведомлений
+РеализацияСервисаЗаявок --> СервисКатегорий
+РепозиторийЗаявок ..> Заявка
