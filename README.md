@@ -4,89 +4,56 @@
 
 ```mermaid
 graph TD
-    client["Клиент<br>создаёт/отслеживает заявки"]
-    operator["Оператор<br>назначает/меняет статус"]
-    admin["Администратор<br>управляет справочниками"]
-    
-    system(("Система обработки заявок"))
-    
-    email["Email-сервис"]
-    sms["SMS-шлюз"]
-    auth["Внешняя аутентификация"]
-    
-    client -->|HTTPS| system
-    operator -->|HTTPS| system
-    admin -->|HTTPS| system
-    
-    system -->|SMTP| email
-    system -->|HTTP API| sms
-    system -->|LDAP/OAuth2| auth
-
-
+    A[Клиент] -->|HTTPS| S[Система обработки заявок]
+    B[Оператор] -->|HTTPS| S
+    C[Администратор] -->|HTTPS| S
+    S -->|SMTP| D[Email-сервис]
+    S -->|HTTP API| E[SMS-шлюз]
+    S -->|LDAP| F[Внешняя аутентификация]
 graph TD
-    subgraph "Система обработки заявок"
-        web["Веб-приложение<br>React/Angular"]
-        mobile["Мобильное приложение<br>Flutter"]
-        api["Backend API<br>Spring Boot"]
-        db[("PostgreSQL")]
-        cache[("Redis")]
-        worker["Worker<br>Celery"]
+    A[Клиент] --> W[Веб-приложение]
+    A --> M[Мобильное приложение]
+    B[Оператор] --> W
+    C[Администратор] --> W
+    
+    W -->|REST API| API[Backend API]
+    M -->|REST API| API
+    
+    API -->|JDBC| DB[(PostgreSQL)]
+    API -->|Redis| R[(Redis)]
+    API -->|Queue| WK[Worker]
+    
+    WK -->|SMTP| E[Email-сервис]
+    WK -->|HTTP| S[SMS-шлюз]
+graph TD
+    subgraph Backend_API
+        A[Auth Component]
+        B[User Management]
+        C[Ticket Management]
+        D[Category Management]
+        E[Notification Dispatcher]
+        F[Reporting Component]
     end
     
-    email["Email-сервис"]
-    sms["SMS-шлюз"]
-    
-    client["Клиент"] --> web
-    client --> mobile
-    operator["Оператор"] --> web
-    admin["Администратор"] --> web
-    
-    web -->|REST API| api
-    mobile -->|REST API| api
-    
-    api -->|JDBC| db
-    api -->|Redis| cache
-    api -->|Queue| worker
-    
-    worker -->|SMTP| email
-    worker -->|HTTP| sms
-
-graph TD
-    subgraph "Backend API"
-        auth["Auth Component<br>аутентификация"]
-        user["User Management<br>пользователи и роли"]
-        ticket["Ticket Management<br>заявки"]
-        category["Category Management<br>категории и SLA"]
-        notif["Notification Dispatcher<br>уведомления"]
-        report["Reporting Component<br>отчёты"]
-    end
-    
-    db[("PostgreSQL")]
-    cache[("Redis")]
-    worker["Worker"]
-    ext_auth["Внешняя аутентификация"]
-    
-    auth -->|проверка| db
-    auth -->|прокси| ext_auth
-    user -->|CRUD| db
-    ticket -->|сохранение| db
-    ticket -->|проверка| category
-    ticket -->|событие| notif
-    category -->|кеш| cache
-    notif -->|задача| worker
-    report -->|чтение| db
-
+    A -->|check| DB[(PostgreSQL)]
+    A -->|proxy| EA[External Auth]
+    B -->|CRUD| DB
+    C -->|save| DB
+    C -->|validate| D
+    C -->|event| E
+    D -->|cache| R[(Redis)]
+    E -->|task| WK[Worker]
+    F -->|read| DB
 classDiagram
     class Ticket {
-        - Long id
-        - Long userId
-        - String title
-        - String description
-        - Long categoryId
-        - TicketStatus status
-        - LocalDateTime createdAt
-        - LocalDateTime updatedAt
-        + getters/setters()
+        -Long id
+        -Long userId
+        -String title
+        -String description
+        -Long categoryId
+        -TicketStatus status
+        +getters()
+        +setters()
     }
     
     class TicketStatus {
@@ -99,27 +66,24 @@ classDiagram
     
     class TicketService {
         <<interface>>
-        + createTicket(request)
-        + assignTicket(ticketId, assigneeId)
-        + changeStatus(ticketId, newStatus)
-        + getTicketsByUser(userId)
+        +createTicket(request)
+        +assignTicket(id, assigneeId)
+        +changeStatus(id, status)
     }
     
     class TicketServiceImpl {
-        - TicketRepository repository
-        - NotificationDispatcher dispatcher
-        - CategoryService categoryService
-        + createTicket(request)
-        + assignTicket(ticketId, assigneeId)
-        + changeStatus(ticketId, newStatus)
+        -TicketRepository repo
+        -NotificationDispatcher nd
+        -CategoryService cs
+        +createTicket(request)
+        +assignTicket(id, assigneeId)
     }
     
     class TicketRepository {
         <<interface>>
-        + save(ticket)
-        + findById(id)
-        + findByUserId(userId)
-        + findByStatus(status)
+        +save(ticket)
+        +findById(id)
+        +findByUser(userId)
     }
     
     TicketServiceImpl ..|> TicketService
