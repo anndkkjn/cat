@@ -10,21 +10,20 @@ graph TD
     S -->|SMTP| D[Email-сервис]
     S -->|HTTP API| E[SMS-шлюз]
     S -->|LDAP| F[Внешняя аутентификация]
+2. Диаграмма контейнеров (Container Diagram)
 graph TD
     A[Клиент] --> W[Веб-приложение]
     A --> M[Мобильное приложение]
     B[Оператор] --> W
     C[Администратор] --> W
-    
     W -->|REST API| API[Backend API]
     M -->|REST API| API
-    
     API -->|JDBC| DB[(PostgreSQL)]
     API -->|Redis| R[(Redis)]
     API -->|Queue| WK[Worker]
-    
     WK -->|SMTP| E[Email-сервис]
     WK -->|HTTP| S[SMS-шлюз]
+3. Диаграмма компонентов (Component Diagram)
 graph TD
     subgraph Backend_API
         A[Auth Component]
@@ -34,7 +33,6 @@ graph TD
         E[Notification Dispatcher]
         F[Reporting Component]
     end
-    
     A -->|check| DB[(PostgreSQL)]
     A -->|proxy| EA[External Auth]
     B -->|CRUD| DB
@@ -44,6 +42,7 @@ graph TD
     D -->|cache| R[(Redis)]
     E -->|task| WK[Worker]
     F -->|read| DB
+4. Диаграмма кода (Code Diagram)
 classDiagram
     class Ticket {
         -Long id
@@ -55,7 +54,6 @@ classDiagram
         +getters()
         +setters()
     }
-    
     class TicketStatus {
         <<enum>>
         NEW
@@ -63,14 +61,12 @@ classDiagram
         RESOLVED
         CLOSED
     }
-    
     class TicketService {
         <<interface>>
         +createTicket(request)
         +assignTicket(id, assigneeId)
         +changeStatus(id, status)
     }
-    
     class TicketServiceImpl {
         -TicketRepository repo
         -NotificationDispatcher nd
@@ -78,14 +74,12 @@ classDiagram
         +createTicket(request)
         +assignTicket(id, assigneeId)
     }
-    
     class TicketRepository {
         <<interface>>
         +save(ticket)
         +findById(id)
         +findByUser(userId)
     }
-    
     TicketServiceImpl ..|> TicketService
     TicketServiceImpl --> TicketRepository
     TicketServiceImpl --> NotificationDispatcher
