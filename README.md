@@ -10,6 +10,7 @@ graph TD
     S -->|SMTP| D[Email-сервис]
     S -->|HTTP API| E[SMS-шлюз]
     S -->|LDAP| F[Внешняя аутентификация]
+
 2. Диаграмма контейнеров (Container Diagram)
 graph TD
     A[Клиент] --> W[Веб-приложение]
@@ -23,6 +24,7 @@ graph TD
     API -->|Queue| WK[Worker]
     WK -->|SMTP| E[Email-сервис]
     WK -->|HTTP| S[SMS-шлюз]
+
 3. Диаграмма компонентов (Component Diagram)
 graph TD
     subgraph Backend_API
@@ -42,6 +44,7 @@ graph TD
     D -->|cache| R[(Redis)]
     E -->|task| WK[Worker]
     F -->|read| DB
+
 4. Диаграмма кода (Code Diagram)
 classDiagram
     class Ticket {
