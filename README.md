@@ -1,7 +1,3 @@
-# C4 Diagrams for Ticket Processing System
-
-## 1. Context Diagram
-
 ```mermaid
 graph TD
     A[Client] -->|HTTPS| S[Ticket System]
@@ -10,7 +6,9 @@ graph TD
     S -->|SMTP| D[Email Service]
     S -->|HTTP API| E[SMS Gateway]
     S -->|LDAP| F[External Auth]
-2. Container Diagram
+```
+
+```mermaid
 graph TD
     A[Client] --> W[Web App]
     A --> M[Mobile App]
@@ -23,7 +21,9 @@ graph TD
     API -->|Queue| WK[Worker]
     WK -->|SMTP| E[Email Service]
     WK -->|HTTP| S[SMS Gateway]
-3. Component Diagram
+```
+
+```mermaid
 graph TD
     subgraph Backend_API
         A[Auth Component]
@@ -42,7 +42,9 @@ graph TD
     D -->|cache| R[(Redis)]
     E -->|task| WK[Worker]
     F -->|read| DB
-4. Code Diagram
+```
+
+```mermaid
 classDiagram
     class Ticket {
         -Long id
@@ -85,3 +87,4 @@ classDiagram
     TicketServiceImpl --> NotificationDispatcher
     TicketServiceImpl --> CategoryService
     TicketRepository ..> Ticket
+```
