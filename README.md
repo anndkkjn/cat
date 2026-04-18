@@ -1,31 +1,29 @@
-# Диаграммы C4 для системы обработки заявок клиентов
+# C4 Diagrams for Ticket Processing System
 
-## 1. Диаграмма контекста (Context Diagram)
+## 1. Context Diagram
 
 ```mermaid
 graph TD
-    A[Клиент] -->|HTTPS| S[Система обработки заявок]
-    B[Оператор] -->|HTTPS| S
-    C[Администратор] -->|HTTPS| S
-    S -->|SMTP| D[Email-сервис]
-    S -->|HTTP API| E[SMS-шлюз]
-    S -->|LDAP| F[Внешняя аутентификация]
-
-2. Диаграмма контейнеров (Container Diagram)
+    A[Client] -->|HTTPS| S[Ticket System]
+    B[Operator] -->|HTTPS| S
+    C[Admin] -->|HTTPS| S
+    S -->|SMTP| D[Email Service]
+    S -->|HTTP API| E[SMS Gateway]
+    S -->|LDAP| F[External Auth]
+2. Container Diagram
 graph TD
-    A[Клиент] --> W[Веб-приложение]
-    A --> M[Мобильное приложение]
-    B[Оператор] --> W
-    C[Администратор] --> W
+    A[Client] --> W[Web App]
+    A --> M[Mobile App]
+    B[Operator] --> W
+    C[Admin] --> W
     W -->|REST API| API[Backend API]
     M -->|REST API| API
     API -->|JDBC| DB[(PostgreSQL)]
     API -->|Redis| R[(Redis)]
     API -->|Queue| WK[Worker]
-    WK -->|SMTP| E[Email-сервис]
-    WK -->|HTTP| S[SMS-шлюз]
-
-3. Диаграмма компонентов (Component Diagram)
+    WK -->|SMTP| E[Email Service]
+    WK -->|HTTP| S[SMS Gateway]
+3. Component Diagram
 graph TD
     subgraph Backend_API
         A[Auth Component]
@@ -44,8 +42,7 @@ graph TD
     D -->|cache| R[(Redis)]
     E -->|task| WK[Worker]
     F -->|read| DB
-
-4. Диаграмма кода (Code Diagram)
+4. Code Diagram
 classDiagram
     class Ticket {
         -Long id
